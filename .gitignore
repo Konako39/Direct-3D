@@ -1,0 +1,18 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.aps
+
+# Build output
+bin/
+obj/
+x64/
+x86/
+Debug/
+Release/
+
+# Local logs and OS files
+*.log
+Thumbs.db
+Desktop.ini
