@@ -15,7 +15,7 @@
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}</ProjectGuid>
     <RootNamespace>Direct3DProject</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
     <ProjectName>Direct3DProject</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -86,13 +86,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Src\Main\main.cpp" />
+    <ClCompile Include="cube.cpp" />
+    <ClCompile Include="Shader3D.cpp" />
     <ClCompile Include="Src\Main\application.cpp" />
+    <ClCompile Include="Src\Main\main.cpp" />
     <ClCompile Include="Src\Core\direct3d.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cube.h" />
+    <ClInclude Include="shader.h" />
+    <ClInclude Include="Shader3D.h" />
     <ClInclude Include="Src\Main\application.h" />
     <ClInclude Include="Src\Core\direct3d.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shader_vertex_3d.hlsl" />
+    <None Include="shader_pixel_3d.hlsl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Target Name="CompileHlslShaders" BeforeTargets="Link">
+    <Exec Command="&quot;$(WindowsSdkDir)bin\$(WindowsTargetPlatformVersion)\x64\fxc.exe&quot; /nologo /E main /T vs_5_0 /Fo &quot;$(OutDir)shader_vertex_3d.cso&quot; &quot;$(ProjectDir)shader_vertex_3d.hlsl&quot;" />
+    <Exec Command="&quot;$(WindowsSdkDir)bin\$(WindowsTargetPlatformVersion)\x64\fxc.exe&quot; /nologo /E main /T ps_5_0 /Fo &quot;$(OutDir)shader_pixel_3d.cso&quot; &quot;$(ProjectDir)shader_pixel_3d.hlsl&quot;" />
+  </Target>
 </Project>
