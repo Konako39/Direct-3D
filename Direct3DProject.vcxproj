@@ -87,6 +87,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="cube.cpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="grid.cpp" />
     <ClCompile Include="Shader3D.cpp" />
     <ClCompile Include="Src\Main\application.cpp" />
     <ClCompile Include="Src\Main\main.cpp" />
@@ -94,6 +96,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cube.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="grid.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="Shader3D.h" />
     <ClInclude Include="Src\Main\application.h" />

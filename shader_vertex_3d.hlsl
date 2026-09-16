@@ -16,19 +16,19 @@ cbuffer ProjectionBuffer : register(b2)
 struct VS_IN
 {
     float4 pos : POSITION;
-    float2 uv : TEXCOORD0;
+    float4 color : COLOR0;
 };
 
 struct VS_OUT
 {
     float4 posH : SV_POSITION;
-    float2 uv : TEXCOORD0;
+    float4 color : COLOR0;
 };
 
 VS_OUT main(VS_IN input)
 {
     VS_OUT output;
     output.posH = mul(mul(mul(input.pos, world), view), proj);
-    output.uv = input.uv;
+    output.color = input.color;
     return output;
 }

@@ -4,6 +4,7 @@
 #include "shader3d.h"
 #include "cube.h"
 #include "Src/Core/direct3d.h"
+#include <Windows.h>
 using namespace DirectX;
 
 static ID3D11Buffer* g_VertexBuffer = nullptr;
@@ -17,10 +18,11 @@ static ID3D11DepthStencilState* g_DepthStencilState = nullptr;
 struct Vertex
 {
 	XMFLOAT4 position; // 位置
-	XMFLOAT2 uv;       // 纹理坐标
+	XMFLOAT4 color;    // 顶点颜色（RGBA）
 };
 
-static constexpr int NUM_VERTEX = 6; // 立方体的顶点数量
+static constexpr int NUM_VERTEX = 36; // 立方体的顶点数量
+
 
 bool Cube_Initialize()
 {
@@ -42,13 +44,65 @@ bool Cube_Initialize()
 	};
 
 	Vertex v[NUM_VERTEX]{
-		{{-0.5f, 0.5f, -0.5f, 1.0f}, {0.0f, 0.0f}},
-		{{ 0.5f, 0.5f, -0.5f, 1.0f}, {1.0f, 0.0f}},
-		{{-0.5f,-0.5f, -0.5f, 1.0f}, {0.0f, 1.0f}},
+	// 前面 Z = -0,5
+	{{-0.5f, 0.5f, -0.5f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}},
+	{{ 0.5f, 0.5f, -0.5f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}},
+	{{-0.5f,-0.5f, -0.5f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}},
 
-		{{-0.5f,-0.5f, -0.5f, 1.0f}, {0.0f, 1.0f}},
-		{{ 0.5f,-0.5f, -0.5f, 1.0f}, {1.0f, 1.0f}},
-		{{ 0.5f, 0.5f, -0.5f, 1.0f}, {1.0f, 0.0f}},
+	{{-0.5f,-0.5f, -0.5f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}},
+	{{ 0.5f, 0.5f, -0.5f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}},
+	{{ 0.5f,-0.5f, -0.5f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}},
+
+
+	// 右面 X = +0.5
+	{{ 0.5f,-0.5f,-0.5f, 1.0f}, {0.0f, 1.0f, 1.0f, 1.0f}},
+	{{ 0.5f, 0.5f,-0.5f, 1.0f}, {0.0f, 1.0f, 1.0f, 1.0f}},
+	{{ 0.5f,-0.5f, 0.5f, 1.0f}, {0.0f, 1.0f, 1.0f, 1.0f}},
+
+	{{ 0.5f, 0.5f,-0.5f, 1.0f}, {0.0f, 1.0f, 1.0f, 1.0f}},
+	{{ 0.5f, 0.5f, 0.5f, 1.0f}, {0.0f, 1.0f, 1.0f, 1.0f}},
+	{{ 0.5f,-0.5f, 0.5f, 1.0f}, {0.0f, 1.0f, 1.0f, 1.0f}},
+
+
+	// 后面 Z = +0.5
+	{{-0.5f,-0.5f, 0.5f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
+	{{ 0.5f,-0.5f, 0.5f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
+	{{-0.5f, 0.5f, 0.5f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
+
+	{{-0.5f, 0.5f, 0.5f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
+	{{ 0.5f,-0.5f, 0.5f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
+	{{ 0.5f, 0.5f, 0.5f, 1.0f}, {1.0f, 0.0f, 0.0f, 1.0f}},
+
+
+	// 左面 X = -0.5
+	{{-0.5f,-0.5f, 0.5f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},
+	{{-0.5f, 0.5f, 0.5f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},
+	{{-0.5f,-0.5f,-0.5f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},
+
+	{{-0.5f, 0.5f, 0.5f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},
+	{{-0.5f, 0.5f,-0.5f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},
+	{{-0.5f,-0.5f,-0.5f, 1.0f}, {0.0f, 1.0f, 0.0f, 1.0f}},
+
+
+	// 上面 Y = +0.5
+	{{-0.5f, 0.5f, 0.5f, 1.0f}, {0.0f, 0.0f, 1.0f, 1.0f}},
+	{{ 0.5f, 0.5f, 0.5f, 1.0f}, {0.0f, 0.0f, 1.0f, 1.0f}},
+	{{-0.5f, 0.5f,-0.5f, 1.0f}, {0.0f, 0.0f, 1.0f, 1.0f}},
+
+	{{-0.5f, 0.5f,-0.5f, 1.0f}, {0.0f, 0.0f, 1.0f, 1.0f}},
+	{{ 0.5f, 0.5f, 0.5f, 1.0f}, {0.0f, 0.0f, 1.0f, 1.0f}},
+	{{ 0.5f, 0.5f,-0.5f, 1.0f}, {0.0f, 0.0f, 1.0f, 1.0f}},
+
+
+	// 下面 Y = -0.5
+	{{-0.5f,-0.5f,-0.5f, 1.0f}, {1.0f, 1.0f, 0.0f, 1.0f}},
+	{{ 0.5f,-0.5f,-0.5f, 1.0f}, {1.0f, 1.0f, 0.0f, 1.0f}},
+	{{-0.5f,-0.5f, 0.5f, 1.0f}, {1.0f, 1.0f, 0.0f, 1.0f}},
+
+	{{-0.5f,-0.5f, 0.5f, 1.0f}, {1.0f, 1.0f, 0.0f, 1.0f}},
+	{{ 0.5f,-0.5f,-0.5f, 1.0f}, {1.0f, 1.0f, 0.0f, 1.0f}},
+	{{ 0.5f,-0.5f, 0.5f, 1.0f}, {1.0f, 1.0f, 0.0f, 1.0f}},
+
 	};
 	D3D11_SUBRESOURCE_DATA sd{};
 	sd.pSysMem = v;
@@ -98,7 +152,7 @@ void Cube_Finalize()
 	SAFE_RELEASE(g_RasterizerState);
 	SAFE_RELEASE(g_VertexBuffer);
 }
-void Cube_Draw()
+void Cube_Draw(const XMMATRIX& world)
 {
 	if (g_VertexBuffer == nullptr || g_RasterizerState == nullptr ||
 		g_DepthStencilState == nullptr || Direct3D_GetDeviceContext() == nullptr)
@@ -106,25 +160,13 @@ void Cube_Draw()
 		return;
 	}
 
-	// Shader设定
-	Shader3D_Begin();
-
 	Direct3D_GetDeviceContext()->OMSetDepthStencilState(g_DepthStencilState, 0);
 	Direct3D_GetDeviceContext()->RSSetState(g_RasterizerState);
 	// 设置GPU的深度测试状态 让GPU现在就用这套规则
-
-	// 世界坐标变换行列 用Shader设置
-	Shader3D_SetWorldMatrix(XMMatrixIdentity());
-	// View矩阵变换行列
-	XMMATRIX view = XMMatrixLookAtLH(
-		XMVectorSet(0.0f, 0.0f, -3.0f, 1.0f), // 相机位置
-		XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f), // 相机看向的目标点
-		XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f)  // 相机的上方向
-	);
-	Shader3D_SetViewMatrix(view);
-	// projection矩阵变换行列 投影矩阵是透视投影矩阵 60度视角
-	XMMATRIX proj = XMMatrixPerspectiveFovLH(XMConvertToRadians(60.0f), (float)(SCREEN_WIDTH / SCREEN_HEIGHT), 0.1f, 100.0f);
-	Shader3D_SetProjectionMatrix(proj);
+	
+	// 世界坐标变换行列 用Shader设置 这里用单位矩阵
+	// 运动 旋转 缩放 就是矩阵相乘 GG那个
+	Shader3D_SetWorldMatrix(world);
 
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
@@ -136,6 +178,11 @@ void Cube_Draw()
 	Direct3D_GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	// 告诉GPU 这些顶点是三角形列表
 
+
+
 	Direct3D_GetDeviceContext()->Draw(NUM_VERTEX, 0);
 	// 告诉GPU 画多少个顶点 NUM_VERTEX是数量 0是从第几个顶点开始
+
+
+
 }
